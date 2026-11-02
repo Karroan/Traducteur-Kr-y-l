@@ -1,0 +1,626 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Traducteur Kréyòl Matinik</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Figtree:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: full-bleed madras band, a title plate overlapping it, then a two-column translator (French | Kréyòl) that stacks on phones. */
+:root {
+  --bg: #eef3ef;
+  --surface: #ffffff;
+  --fg: #10261e;
+  --muted: #566b62;
+  --line: #d2ddd6;
+  --hibiscus: #c4203a;
+  --on-hib: #ffffff;
+  --sea: #0a6c72;
+  --sun: #f2b705;
+  --leaf: #2f7d46;
+  --sea-soft: #dff0ee;
+  --result-bg: #0a6c72;
+  --on-result: #ffffff;
+  --result-soft: rgba(255, 255, 255, .15);
+  --shadow: 0 12px 32px rgba(16, 38, 30, .10);
+  --dim: rgba(0, 0, 0, 0);
+  --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+  --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a1716; --surface: #132726; --fg: #e8f2ee; --muted: #93aaa2; --line: #284441;
+    --hibiscus: #ff6b82; --on-hib: #1b0a0e; --sea: #55c6cb; --sun: #f6c637; --leaf: #6cc788; --sea-soft: #173a3b;
+    --result-bg: #0e5459; --on-result: #f0fbf9; --shadow: 0 12px 32px rgba(0, 0, 0, .4); --dim: rgba(0, 0, 0, .4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0a1716; --surface: #132726; --fg: #e8f2ee; --muted: #93aaa2; --line: #284441;
+  --hibiscus: #ff6b82; --on-hib: #1b0a0e; --sea: #55c6cb; --sun: #f6c637; --leaf: #6cc788; --sea-soft: #173a3b;
+  --result-bg: #0e5459; --on-result: #f0fbf9; --shadow: 0 12px 32px rgba(0, 0, 0, .4); --dim: rgba(0, 0, 0, .4);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  padding-block: 0 56px;
+}
+:focus-visible { outline: 3px solid var(--sea); outline-offset: 2px; border-radius: 6px; }
+
+/* Madras band */
+.hero {
+  height: 128px;
+  background:
+    linear-gradient(var(--dim), var(--dim)),
+    repeating-linear-gradient(90deg, rgba(10, 108, 114, .55) 0 30px, transparent 30px 70px),
+    repeating-linear-gradient(0deg, rgba(196, 32, 58, .62) 0 26px, transparent 26px 60px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .6) 0 3px, transparent 3px 17px),
+    repeating-linear-gradient(0deg, rgba(16, 38, 30, .45) 0 3px, transparent 3px 21px),
+    #f2b705;
+}
+.in {
+  max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+
+/* Title plate */
+.plate {
+  margin-top: -64px; position: relative; background: var(--surface); border: 2px solid var(--line); border-radius: 20px;
+  padding: 22px 20px 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px;
+}
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--sea); }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(36px, 10vw, 64px); line-height: 1; margin: 0; letter-spacing: -.025em; text-wrap: balance; }
+h1 span { color: var(--hibiscus); }
+.lede { margin: 0; color: var(--muted); max-width: 56ch; font-size: 17px; }
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.pill { font: 500 12px var(--font-mono); letter-spacing: .04em; padding: 5px 11px; border-radius: 999px; background: var(--sea-soft); color: var(--sea); }
+
+/* Tabs */
+.tabs { display: inline-flex; gap: 4px; padding: 4px; background: var(--surface); border: 2px solid var(--line); border-radius: 999px; align-self: flex-start; }
+.tab { font: 600 15px var(--font-body); color: var(--muted); background: none; border: 0; padding: 9px 22px; border-radius: 999px; cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--hibiscus); color: var(--on-hib); }
+
+/* Translator */
+.tr-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.card-in { background: var(--surface); border: 2px solid var(--line); border-radius: 20px; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.card-in:focus-within { border-color: var(--sea); }
+.badge { font: 500 12px var(--font-mono); letter-spacing: .1em; text-transform: uppercase; padding: 4px 11px; border-radius: 999px; align-self: flex-start; }
+.badge.fr { background: var(--sea-soft); color: var(--sea); }
+.badge.ko { background: var(--sun); color: #10261e; }
+textarea {
+  width: 100%; font: 500 22px/1.35 var(--font-body); color: var(--fg); background: transparent; border: 0; padding: 0;
+  min-height: 140px; resize: vertical;
+}
+textarea:focus { outline: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  font: 500 14px var(--font-body); color: var(--fg); background: var(--bg); border: 1.5px solid var(--line);
+  border-radius: 999px; padding: 8px 13px; cursor: pointer;
+}
+.chip:hover { border-color: var(--sea); }
+.chip[aria-pressed="true"] { background: var(--sea); border-color: var(--sea); color: var(--surface); }
+.actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.btn {
+  font: 700 17px var(--font-display); background: var(--hibiscus); color: var(--on-hib); border: 0; border-radius: 12px;
+  padding: 13px 26px; cursor: pointer;
+}
+.btn:hover { filter: brightness(1.06); }
+.btn:disabled { opacity: .6; cursor: progress; }
+.kbd { font: 400 12px var(--font-mono); color: var(--muted); display: none; }
+
+.card-out {
+  position: relative; overflow: hidden; background: var(--result-bg); color: var(--on-result); border-radius: 20px;
+  padding: 28px 18px 18px; display: flex; flex-direction: column; gap: 14px; box-shadow: var(--shadow);
+}
+.card-out::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 8px;
+  background: repeating-linear-gradient(90deg, var(--hibiscus) 0 24px, var(--sun) 24px 32px, #fff 32px 38px, var(--sun) 38px 46px);
+}
+.out { font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 6vw, 40px); line-height: 1.15; margin: 0; flex: 1; min-height: 2.4em; white-space: pre-wrap; overflow-wrap: anywhere; }
+.notes { margin: 0; padding: 10px 12px; background: var(--result-soft); border-radius: 10px; font-size: 14px; white-space: pre-wrap; }
+.meta { font: 400 12px var(--font-mono); color: var(--on-result); opacity: .85; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; justify-content: space-between; }
+.btn.ghost { background: transparent; color: var(--on-result); border: 1.5px solid var(--on-result); padding: 8px 14px; font: 600 14px var(--font-body); border-radius: 10px; }
+.warn { margin: 0; font-size: 14px; color: var(--muted); max-width: 70ch; }
+.warn b { color: var(--hibiscus); }
+
+/* Lexicon */
+.lx-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.lx-side { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.lx-main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.card { background: var(--surface); border: 2px solid var(--line); border-radius: 20px; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.card h2 { font-family: var(--font-display); font-size: 19px; margin: 0; }
+.marks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.mark { display: flex; flex-direction: column; gap: 2px; min-width: 0; background: var(--bg); border-radius: 12px; padding: 10px 12px; border-top: 4px solid var(--c); }
+.m-ka { --c: var(--hibiscus); } .m-te { --c: var(--sun); } .m-kay { --c: var(--sea); } .m-pa { --c: var(--leaf); }
+.mark b { font-family: var(--font-display); font-size: 24px; }
+.mark span { font-size: 13px; color: var(--muted); }
+.mark i { font-style: normal; font-size: 14px; overflow-wrap: anywhere; }
+.hint { margin: 0; font-size: 14px; color: var(--muted); }
+label.field { font: 500 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+input[type="search"], input[type="text"] {
+  width: 100%; font: 500 17px/1.4 var(--font-body); color: var(--fg); background: var(--surface);
+  border: 2px solid var(--line); border-radius: 12px; padding: 11px 14px;
+}
+input:focus { border-color: var(--sea); outline: none; }
+.add { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.add .btn { font-size: 16px; padding: 11px 20px; justify-self: start; }
+.count { font: 400 12px var(--font-mono); color: var(--muted); }
+.list { display: flex; flex-direction: column; border: 2px solid var(--line); border-radius: 20px; background: var(--surface); overflow: hidden; }
+.row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; padding: 12px 16px; border-top: 1px solid var(--line); align-items: center; }
+.row.custom { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
+.row:first-child { border-top: 0; }
+.row:hover { background: var(--sea-soft); }
+.row .fr { color: var(--muted); overflow-wrap: anywhere; }
+.row .ko { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--sea); overflow-wrap: anywhere; }
+.row .del { font: 600 13px var(--font-body); background: none; border: 1.5px solid var(--line); color: var(--muted); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+.empty { padding: 22px 16px; color: var(--muted); }
+footer { font-size: 13px; color: var(--muted); }
+
+@media (min-width: 640px) {
+  .hero { height: 150px; }
+  .plate { margin-top: -80px; padding: 30px 34px 28px; gap: 12px; }
+  .add { grid-template-columns: 1fr 1fr; }
+  .add .btn { grid-column: 1 / -1; }
+  textarea { font-size: 26px; min-height: 150px; }
+  .card-in, .card-out { padding: 22px; }
+  .card-out { padding-top: 32px; }
+  .marks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 900px) {
+  .tr-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; }
+  .lx-grid { grid-template-columns: 340px minmax(0, 1fr); gap: 28px; align-items: start; }
+  .lx-side { position: sticky; top: 16px; }
+  .add { grid-template-columns: 1fr; }
+  .kbd { display: inline; }
+  textarea { min-height: 150px; }
+  .out { font-size: clamp(34px, 3.6vw, 46px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .card-out { animation: rise .3s ease-out; }
+  @keyframes rise { from { opacity: .5; transform: translateY(6px); } }
+}
+</style>
+
+<div class="hero" aria-hidden="true"></div>
+<div class="in">
+  <header class="plate">
+    <div class="eyebrow">Français → Kréyòl matinitjé</div>
+    <h1>Traducteur <span>Kréyòl</span></h1>
+    <p class="lede">Écris en français, lis en créole martiniquais. Une traduction rapide, avec un lexique à parcourir et à compléter.</p>
+    <div class="pills"><span class="pill">Orthographe GEREC</span><span class="pill">Sans connexion</span><span class="pill">PC et mobile</span></div>
+  </header>
+
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" id="tab-tr" aria-selected="true" aria-controls="p-tr">Traduire</button>
+    <button class="tab" role="tab" id="tab-lx" aria-selected="false" aria-controls="p-lx">Lexique</button>
+  </div>
+
+  <section id="p-tr" role="tabpanel" aria-labelledby="tab-tr" style="display:flex;flex-direction:column;gap:18px">
+    <div class="tr-grid">
+      <div class="card-in">
+        <span class="badge fr">Français</span>
+        <label class="field" for="src" style="position:absolute;left:-9999px">Texte en français</label>
+        <textarea id="src" spellcheck="true" placeholder="Écris ici…">Bonjour, comment ça va ?</textarea>
+        <div class="chips" id="examples" aria-label="Exemples"></div>
+        <div class="actions"><button class="btn" id="go" type="button">Traduire</button><span class="kbd">Ctrl + Entrée</span></div>
+      </div>
+      <div class="card-out" id="res" aria-live="polite">
+        <span class="badge ko">Kréyòl matinitjé</span>
+        <p class="out" id="out"></p>
+        <p class="notes" id="notes" hidden></p>
+        <div class="meta"><span id="src-label"></span><button class="btn ghost" id="copy" type="button">Copier</button></div>
+      </div>
+    </div>
+    <p class="warn"><b>À vérifier :</b> le créole varie d'une commune à l'autre. Pour un texte important, fais relire par un locuteur.</p>
+  </section>
+
+  <section id="p-lx" role="tabpanel" aria-labelledby="tab-lx" hidden>
+    <div class="lx-grid">
+      <aside class="lx-side">
+        <div class="card">
+          <h2>Les petits mots du verbe</h2>
+          <div class="marks">
+            <div class="mark m-ka"><b>ka</b><span>action en cours</span><i>Mwen ka manjé<br>Je mange</i></div>
+            <div class="mark m-te"><b>té</b><span>passé</span><i>Mwen té manjé<br>J'ai mangé</i></div>
+            <div class="mark m-kay"><b>kay</b><span>futur</span><i>Mwen kay manjé<br>Je vais manger</i></div>
+            <div class="mark m-pa"><b>pa</b><span>négation</span><i>Mwen pa ka manjé<br>Je ne mange pas</i></div>
+          </div>
+        </div>
+        <div class="card">
+          <h2>Ajouter un mot</h2>
+          <p class="hint">Tes mots sont gardés sur cet appareil et utilisés par le traducteur.</p>
+          <form class="add" id="addform" autocomplete="off">
+            <input type="text" id="addfr" placeholder="Français (ex. voisin)" aria-label="Mot ou phrase en français" required>
+            <input type="text" id="addko" placeholder="Kréyòl (ex. vwazen)" aria-label="Traduction en créole" required>
+            <button class="btn" type="submit">Ajouter</button>
+          </form>
+        </div>
+      </aside>
+      <div class="lx-main">
+        <label class="field" for="q">Chercher un mot</label>
+        <input type="search" id="q" placeholder="Ex. maison, merci, manger" autocomplete="off">
+        <div class="chips" id="cats" role="group" aria-label="Catégories"></div>
+        <div class="count" id="count"></div>
+        <div class="list" id="list"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="foot">Traduction par règles : lexique et grammaire de base (ka, té, kay, pa). Le lexique reste à compléter.</footer>
+</div>
+
+<script>
+(function () {
+  // [catégorie, français, kréyòl]
+  var LEX = [
+    ["Salutations","bonjour","bonjou"],["Salutations","bonsoir","bonswa"],["Salutations","bonne nuit","bònnwit"],
+    ["Salutations","au revoir","odévwa"],["Salutations","à plus tard","a pli ta"],["Salutations","merci","mèsi"],
+    ["Salutations","merci beaucoup","mèsi anpil"],["Salutations","s'il vous plaît","souplé"],["Salutations","pardon","padon"],
+    ["Salutations","bienvenue","bienvini"],["Salutations","oui","wi"],["Salutations","non","non"],["Salutations","peut-être","pétèt"],
+    ["Salutations","bon appétit","bon apeti"],["Salutations","santé","santé"],["Salutations","courage","kouraj"],
+    ["Phrases","comment ça va","sa ka fèt"],["Phrases","je vais bien","mwen byen"],["Phrases","je t'aime","mwen enmé'w"],
+    ["Phrases","comment tu t'appelles","kouman ou rèlé"],["Phrases","je m'appelle","mwen rèlé"],
+    ["Phrases","je ne comprends pas","mwen pa konprann"],["Phrases","combien ça coûte","konbyen sa ka koité"],
+    ["Phrases","j'ai faim","mwen grangou"],["Phrases","j'ai soif","mwen swèf"],["Phrases","je suis fatigué","mwen las"],
+    ["Phrases","il fait chaud","i fè cho"],["Phrases","il pleut","lapli ka tonbé"],["Phrases","doucement","dousman"],
+    ["Phrases","allons-y","an alé"],["Phrases","pas de problème","pa ni pwoblèm"],["Phrases","ça va aller","sa kay alé"],
+    ["Phrases","il y a","ni"],
+    ["Pronoms","je","mwen"],["Pronoms","j'","mwen"],["Pronoms","moi","mwen"],["Pronoms","tu","ou"],["Pronoms","toi","ou"],
+    ["Pronoms","il","i"],["Pronoms","elle","i"],["Pronoms","lui","li"],["Pronoms","nous","nou"],["Pronoms","on","nou"],
+    ["Pronoms","vous","zòt"],["Pronoms","ils","yo"],["Pronoms","elles","yo"],["Pronoms","me","mwen"],["Pronoms","m'","mwen"],
+    ["Pronoms","te","ou"],["Pronoms","t'","ou"],["Pronoms","ce","sa"],["Pronoms","ça","sa"],["Pronoms","qui","ki"],["Pronoms","quoi","ki sa"],
+    ["Verbes","manger","manjé"],["Verbes","boire","bwè"],["Verbes","parler","palé"],["Verbes","aller","alé"],["Verbes","venir","vini"],
+    ["Verbes","voir","wè"],["Verbes","savoir","savé"],["Verbes","vouloir","vlé"],["Verbes","pouvoir","pé"],["Verbes","donner","bay"],
+    ["Verbes","prendre","pwan"],["Verbes","dormir","dòmi"],["Verbes","aimer","enmé"],["Verbes","travailler","travay"],
+    ["Verbes","danser","dansé"],["Verbes","chanter","chanté"],["Verbes","rire","ri"],["Verbes","pleurer","plèwé"],
+    ["Verbes","marcher","maché"],["Verbes","regarder","gadé"],["Verbes","écouter","koutè"],["Verbes","comprendre","konprann"],
+    ["Verbes","dire","di"],["Verbes","faire","fè"],["Verbes","avoir","ni"],
+    ["Famille","enfant","timoun"],["Famille","homme","nonm"],["Famille","femme","fanm"],["Famille","ami","zanmi"],
+    ["Famille","mère","manman"],["Famille","père","papa"],["Famille","frère","frè"],["Famille","sœur","sè"],["Famille","grand-mère","granmè"],
+    ["Nature","maison","kay"],["Nature","eau","dlo"],["Nature","mer","lanmè"],["Nature","soleil","solèy"],["Nature","lune","lalin"],
+    ["Nature","pluie","lapli"],["Nature","vent","van"],["Nature","arbre","pyé bwa"],["Nature","fleur","flè"],
+    ["Nature","chien","chyen"],["Nature","chat","chat"],["Nature","poisson","pwason"],["Nature","poule","poul"],["Nature","cochon","kochon"],
+    ["Cuisine","pain","pen"],["Cuisine","riz","diri"],["Cuisine","banane","bannann"],["Cuisine","mangue","mango"],
+    ["Cuisine","ananas","zannana"],["Cuisine","rhum","wonm"],["Cuisine","punch","ponch"],["Cuisine","café","kafé"],
+    ["Cuisine","piment","piman"],["Cuisine","igname","yanm"],["Cuisine","manioc","manyòk"],["Cuisine","accras","akra"],["Cuisine","colombo","kolonbo"],
+    ["Mots utiles","travail","travay"],["Mots utiles","argent","lajan"],["Mots utiles","jour","jou"],["Mots utiles","nuit","nwit"],
+    ["Mots utiles","demain","dèmen"],["Mots utiles","hier","yè"],["Mots utiles","aujourd'hui","jòdi-a"],["Mots utiles","beaucoup","anpil"],
+    ["Mots utiles","petit","ti"],["Mots utiles","grand","gran"],["Mots utiles","bon","bon"],["Mots utiles","beau","bèl"],
+    ["Mots utiles","mauvais","move"],["Mots utiles","chaud","cho"],["Mots utiles","et","é"],["Mots utiles","avec","épi"],
+    ["Mots utiles","pour","pou"],["Mots utiles","dans","adan"],["Mots utiles","sur","asi"],["Mots utiles","sous","anba"],
+    ["Mots utiles","mais","men"],["Mots utiles","comment","kouman"],["Mots utiles","pourquoi","poukisa"],["Mots utiles","quand","ki lè"],
+    ["Mots utiles","combien","konbyen"],["Mots utiles","ici","isi"],["Mots utiles","maintenant","kounyéa"],["Mots utiles","toujours","toutan"],
+    ["Mots utiles","jamais","jamé"],["Mots utiles","aussi","osi"],["Mots utiles","encore","ankò"],["Mots utiles","rien","anyen"],
+    ["Mots utiles","chez","lakay"],["Mots utiles","trop","two"],["Mots utiles","bien","byen"],["Mots utiles","faim","grangou"],
+    ["Mots utiles","soif","swèf"],["Mots utiles","fatigué","las"],["Mots utiles","content","kontan"],["Mots utiles","triste","tris"],
+    ["Mots utiles","école","lékòl"],["Mots utiles","voiture","loto"],["Mots utiles","livre","liv"],["Mots utiles","ville","vil"],["Mots utiles","bateau","bato"],
+    ["Nombres","un","yonn"],["Nombres","deux","dé"],["Nombres","trois","twa"],["Nombres","quatre","kat"],["Nombres","cinq","senk"],
+    ["Nombres","six","sis"],["Nombres","sept","sèt"],["Nombres","huit","wit"],["Nombres","neuf","nèf"],["Nombres","dix","dis"]
+  ];
+  var EXAMPLES = ["Bonjour, comment ça va ?", "Je t'aime", "J'ai faim", "Je ne comprends pas", "Nous allons manger du pain", "Elle a mangé la mangue"];
+  var KEY = "kreyol-mes-mots";
+
+  function $(id) { return document.getElementById(id); }
+  function strip(s) { return s.normalize("NFD").replace(/[̀-ͯ]/g, ""); }
+  function key(t) { return strip(t.toLowerCase()); }
+  function tok(s) {
+    return s.toLowerCase().replace(/[’‘]/g, "'").match(/[a-zà-ÿœ]+(?:-[a-zà-ÿœ]+)*'?|\d+|[^\s]/g) || [];
+  }
+  function isWord(t) { return /^[a-zà-ÿœ]/.test(t); }
+  function inList(a, t) { return a.indexOf(t) > -1; }
+  function cap(s) { return s.replace(/(^|[.!?…]\s+)([a-zà-ÿ])/g, function (m, a, b) { return a + b.toUpperCase(); }); }
+
+  // Mots personnels (gardés sur l'appareil)
+  var CUSTOM = [];
+  try {
+    var raw = JSON.parse(localStorage.getItem(KEY) || "[]");
+    if (Array.isArray(raw)) CUSTOM = raw.filter(function (e) { return Array.isArray(e) && typeof e[0] === "string" && typeof e[1] === "string"; });
+  } catch (e) { CUSTOM = []; }
+  function saveCustom() { try { localStorage.setItem(KEY, JSON.stringify(CUSTOM)); } catch (e) {} }
+
+  // Verbes : conjugaisons usuelles
+  var VF = {}, PART = {}, INF = {};
+  function addVerb(inf, ko, o) {
+    var v = { ko: ko, stat: !!o.stat, motion: !!o.motion };
+    INF[key(inf)] = v;
+    VF[key(inf)] = { ko: ko, stat: v.stat, tense: "inf" };
+    [o.part, o.part + "e", o.part + "s", o.part + "es"].forEach(function (f) {
+      PART[key(f)] = v; VF[key(f)] = { ko: ko, stat: v.stat, tense: "part" };
+    });
+    (o.imp || []).forEach(function (f) { VF[key(f)] = { ko: ko, stat: v.stat, tense: "imp" }; });
+    o.pres.forEach(function (f) { VF[key(f)] = { ko: ko, stat: v.stat, tense: "pres" }; });
+  }
+  function regular(inf, ko, stat) {
+    var s = inf.slice(0, -2), g = /g$/.test(s), e = g ? "e" : "";
+    addVerb(inf, ko, {
+      stat: stat, part: s + "é",
+      pres: [s + "e", s + "es", s + "ons", s + e + "ons", s + "ez", s + "ent"],
+      imp: [s + e + "ais", s + e + "ait", s + "ions", s + "iez", s + e + "aient"]
+    });
+  }
+  function irregular(inf, ko, pres, part, stem, o) {
+    o = o || {};
+    addVerb(inf, ko, {
+      stat: o.stat, motion: o.motion, part: part, pres: pres,
+      imp: ["ais", "ait", "ions", "iez", "aient"].map(function (x) { return stem + x; })
+    });
+  }
+  ["manger:manjé", "parler:palé", "donner:bay", "danser:dansé", "chanter:chanté", "travailler:travay", "pleurer:plèwé",
+   "marcher:maché", "regarder:gadé", "écouter:koutè"].forEach(function (p) { regular(p.split(":")[0], p.split(":")[1], false); });
+  regular("aimer", "enmé", true);
+  irregular("aller", "alé", ["vais", "vas", "va", "allons", "allez", "vont"], "allé", "all", { motion: true });
+  irregular("venir", "vini", ["viens", "vient", "venons", "venez", "viennent"], "venu", "ven", { motion: true });
+  irregular("boire", "bwè", ["bois", "boit", "buvons", "buvez", "boivent"], "bu", "buv");
+  irregular("voir", "wè", ["vois", "voit", "voyons", "voyez", "voient"], "vu", "voy");
+  irregular("savoir", "savé", ["sais", "sait", "savons", "savez", "savent"], "su", "sav", { stat: true });
+  irregular("vouloir", "vlé", ["veux", "veut", "voulons", "voulez", "veulent"], "voulu", "voul", { stat: true });
+  irregular("pouvoir", "pé", ["peux", "peut", "pouvons", "pouvez", "peuvent"], "pu", "pouv", { stat: true });
+  irregular("dormir", "dòmi", ["dors", "dort", "dormons", "dormez", "dorment"], "dormi", "dorm");
+  irregular("prendre", "pwan", ["prends", "prend", "prenons", "prenez", "prennent"], "pris", "pren");
+  irregular("rire", "ri", ["ris", "rit", "rions", "riez", "rient"], "ri", "ri");
+  irregular("comprendre", "konprann", ["comprends", "comprend", "comprenons", "comprenez", "comprennent"], "compris", "compren", { stat: true });
+  irregular("dire", "di", ["dis", "dit", "disons", "dites", "disent"], "dit", "dis");
+  irregular("faire", "fè", ["fais", "fait", "faisons", "faites", "font"], "fait", "fais");
+
+  // Dictionnaire : mots seuls et expressions
+  var ALL = [], WORD = {}, PHR = [];
+  function build() {
+    ALL = CUSTOM.map(function (c) { return ["Mes mots", c[0], c[1]]; }).concat(LEX);
+    WORD = {}; PHR = [];
+    ALL.forEach(function (e) {
+      var ts = tok(e[1]).map(key);
+      if (ts.length === 1) { if (!WORD[ts[0]]) WORD[ts[0]] = e[2]; }
+      else if (ts.length > 1) PHR.push({ k: ts, ko: e[2] });
+    });
+    PHR.sort(function (a, b) { return b.k.length - a.k.length; });
+  }
+  function matchPhrase(T, i) {
+    for (var p = 0; p < PHR.length; p++) {
+      var ph = PHR[p], ok = i + ph.k.length <= T.length;
+      for (var j = 0; ok && j < ph.k.length; j++) if (key(T[i + j]) !== ph.k[j]) ok = false;
+      if (ok) return { ko: ph.ko, n: ph.k.length };
+    }
+    return null;
+  }
+  function lookup(t) {
+    var k = key(t);
+    if (WORD[k]) return WORD[k];
+    if (/[sx]$/.test(k) && WORD[k.slice(0, -1)]) return WORD[k.slice(0, -1)];
+    if (/(e|es)$/.test(k) && k.length > 3) {
+      var f = k.replace(/es?$/, "");
+      if (WORD[f] && !VF[f]) return WORD[f];
+    }
+    return null;
+  }
+
+  var POSS = { mon: "mwen", ma: "mwen", mes: "mwen", ton: "ou", ta: "ou", tes: "ou", son: "li", sa: "li", ses: "li",
+    notre: "nou", nos: "nou", votre: "zòt", vos: "zòt", leur: "yo", leurs: "yo" };
+  var AV = ["ai", "as", "a", "avons", "avez", "ont"], AVI = ["avais", "avait", "avions", "aviez", "avaient"];
+  var ET = ["suis", "es", "est", "sommes", "êtes", "sont"], ETI = ["étais", "était", "étions", "étiez", "étaient"];
+  var AL = ["vais", "vas", "va", "allons", "allez", "vont"];
+  var DROP = ["est-ce", "que", "qu'", "d'", "s'", "du", "des", "de"];
+
+  function localTranslate(text) {
+    var T = tok(text), out = [], unk = [], i = 0, neg = false, negDone = false;
+    function pa() { if (neg && !negDone) { out.push("pa"); negDone = true; } }
+    while (i < T.length) {
+      var t = T[i], k = key(t);
+      if (!isWord(t)) {
+        if (/^[.!?;:…,]$/.test(t)) { out.push({ p: t }); if (t !== ",") { neg = false; negDone = false; } }
+        else out.push(t);
+        i++; continue;
+      }
+      var m = matchPhrase(T, i);
+      if (m) { out.push(m.ko); i += m.n; continue; }
+      if (t === "ne" || t === "n'") { neg = true; negDone = false; i++; continue; }
+      if (neg && (t === "pas" || t === "plus")) { pa(); if (t === "plus") out.push("ankò"); i++; continue; }
+      if (t === "c'" && T[i + 1] === "est") { out.push("sé"); i += 2; continue; }
+      if (t === "là") { out.push("la"); i++; continue; }
+      if (inList(["de", "du", "des"], t) && inList(["la", "le", "les", "l'"], T[i + 1])) { i += 2; continue; }
+      if (inList(DROP, t)) { i++; continue; }
+      if (t === "une" || (t === "un" && T[i + 1] && isWord(T[i + 1]) && lookup(T[i + 1]) && !VF[key(T[i + 1])])) { out.push("yon"); i++; continue; }
+
+      // articles définis : kay-la, kay-yo
+      if (t === "le" || t === "la" || t === "les" || t === "l'") {
+        var n = T[i + 1], nk = n && key(n);
+        if (n && isWord(n) && !POSS[n] && !VF[nk] && !INF[nk] && lookup(n)) {
+          out.push(lookup(n) + (t === "les" ? "-yo" : "-la")); i += 2; continue;
+        }
+        if (n && isWord(n) && (VF[nk] || INF[nk])) out.push("li");
+        i++; continue;
+      }
+      // possessifs : kay mwen
+      if (POSS[t]) {
+        var n2 = T[i + 1];
+        if (n2 && isWord(n2) && lookup(n2) && !VF[key(n2)]) { out.push(lookup(n2) + " " + POSS[t]); i += 2; }
+        else { out.push(POSS[t]); i++; }
+        continue;
+      }
+      // avoir / être
+      var isAV = inList(AV, t), isAVI = inList(AVI, t), isET = inList(ET, t), isETI = inList(ETI, t);
+      if (isAV || isAVI || isET || isETI) {
+        var j = i + 1; if (T[j] === "pas" && neg) j++;
+        var nx = T[j], pv = nx && PART[key(nx)];
+        if (pv && (isAV || isAVI || pv.motion)) { pa(); out.push("té"); out.push(pv.ko); i = j + 1; continue; }
+        if (isAV || isAVI) {
+          if (inList(["faim", "soif", "chaud", "peur"], nx)) { i++; continue; }
+          pa(); if (isAVI) out.push("té"); out.push("ni"); i++; continue;
+        }
+        if (isETI) { pa(); out.push("té"); }
+        i++; continue;
+      }
+      // futur proche : kay
+      if (inList(AL, t)) {
+        var j2 = i + 1; if (T[j2] === "pas" && neg) j2++;
+        var iv = T[j2] && INF[key(T[j2])];
+        if (iv) { pa(); out.push("kay"); out.push(iv.ko); i = j2 + 1; continue; }
+      }
+      // verbes conjugués
+      var v = VF[k];
+      if (v) {
+        pa();
+        if (v.tense === "pres") { if (!v.stat) out.push("ka"); }
+        else if (v.tense === "imp") { out.push("té"); if (!v.stat) out.push("ka"); }
+        out.push(v.ko); i++; continue;
+      }
+      var w = lookup(t);
+      if (w) { out.push(w); i++; continue; }
+      unk.push(t); out.push("‹" + t + "›"); i++;
+    }
+    var s = "";
+    out.forEach(function (x) { if (typeof x === "object") s += x.p; else s += (s ? " " : "") + x; });
+    return { text: cap(s.trim()), unknown: unk };
+  }
+
+  var sample = null, lastOut = "";
+
+  function show(out, notes, label) {
+    lastOut = out;
+    $("out").textContent = out;
+    var n = $("notes");
+    if (notes) { n.textContent = notes; n.hidden = false; } else { n.hidden = true; }
+    $("src-label").textContent = label;
+  }
+  function showLocal(label, prefix) {
+    var t = $("src").value.trim();
+    if (!t) { show("", "", ""); return; }
+    var r = localTranslate(t), notes = prefix || "";
+    if (r.unknown.length) notes += (notes ? "\n" : "") + "Pas dans le lexique : " + r.unknown.join(", ") + ". Tu peux les ajouter dans l'onglet Lexique.";
+    show(r.text, notes, label);
+  }
+
+  var SYSTEM = function () {
+    return "Tu es traducteur du français vers le créole martiniquais (kréyòl matinitjé), en orthographe GEREC. " +
+    "Repères de grammaire : pronoms mwen, ou, i, nou, zòt, yo ; ka = action en cours ; té = passé ; kay = futur ; pa = négation. " +
+    "Vocabulaire de référence : " + ALL.map(function (e) { return e[1] + " = " + e[2]; }).join("; ") + ". " +
+    "Réponds exactement en deux parties séparées par une ligne contenant uniquement ---. " +
+    "Partie 1 : la traduction seule, sans guillemets ni commentaire. " +
+    "Partie 2 : au plus deux notes courtes en français (variante locale, mot incertain), ou RAS s'il n'y a rien à signaler. " +
+    "Si le texte est déjà en créole ou n'est pas du français, traduis ce que tu peux et dis-le dans les notes.\n\nTexte à traduire :\n";
+  };
+
+  async function translate() {
+    var t = $("src").value.trim();
+    if (!t) { show("", "", ""); return; }
+    if (!sample) { showLocal("Traduction par règles et lexique"); return; }
+    var btn = $("go");
+    btn.disabled = true; btn.textContent = "Traduction…";
+    try {
+      var r = await sample(SYSTEM() + t, { onText: function (p) {
+        var first = String(p.text || "").split(/\n---\n/)[0];
+        if (first) $("out").textContent = first;
+      } });
+      var parts = String(r.text || "").split(/\n-{3,}\n/);
+      var out = (parts[0] || "").trim(), notes = (parts[1] || "").trim();
+      if (/^RAS\.?$/i.test(notes)) notes = "";
+      show(out, notes, "Traduit par Claude");
+    } catch (e) {
+      var msg = e && e.code === "rate_limited" ? "Trop de demandes pour le moment, réessaie dans un instant." : "";
+      showLocal("Traduction par règles et lexique", msg);
+    } finally {
+      btn.disabled = false; btn.textContent = "Traduire";
+    }
+  }
+
+  $("go").addEventListener("click", translate);
+  $("src").addEventListener("keydown", function (e) { if ((e.ctrlKey || e.metaKey) && e.key === "Enter") translate(); });
+  var timer = null;
+  $("src").addEventListener("input", function () {
+    if (sample) return;
+    clearTimeout(timer);
+    timer = setTimeout(function () { showLocal("Traduction par règles et lexique"); }, 200);
+  });
+  $("copy").addEventListener("click", function () {
+    var b = $("copy");
+    function done(m) { b.textContent = m; setTimeout(function () { b.textContent = "Copier"; }, 1400); }
+    if (!lastOut) return;
+    function fallback() {
+      var r = document.createRange(); r.selectNodeContents($("out"));
+      var s = getSelection(); s.removeAllRanges(); s.addRange(r); done("Sélectionné");
+    }
+    try {
+      navigator.clipboard.writeText(lastOut).then(function () { done("Copié"); }, fallback);
+    } catch (e) { fallback(); }
+  });
+
+  EXAMPLES.forEach(function (ex) {
+    var b = document.createElement("button");
+    b.type = "button"; b.className = "chip"; b.textContent = ex;
+    b.addEventListener("click", function () { $("src").value = ex; showLocal("Traduction par règles et lexique"); });
+    $("examples").appendChild(b);
+  });
+
+  // Onglets
+  function selectTab(which) {
+    var tr = which === "tr";
+    $("tab-tr").setAttribute("aria-selected", tr); $("tab-lx").setAttribute("aria-selected", !tr);
+    $("p-tr").hidden = !tr; $("p-lx").hidden = tr;
+  }
+  $("tab-tr").addEventListener("click", function () { selectTab("tr"); });
+  $("tab-lx").addEventListener("click", function () { selectTab("lx"); });
+
+  // Lexique
+  var activeCat = "Tout";
+  function renderCats() {
+    var cats = ["Tout"].concat(ALL.map(function (e) { return e[0]; }).filter(function (c, i, a) { return a.indexOf(c) === i; }));
+    if (cats.indexOf(activeCat) < 0) activeCat = "Tout";
+    var box = $("cats"); box.textContent = "";
+    cats.forEach(function (c) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "chip"; b.textContent = c; b.setAttribute("aria-pressed", c === activeCat);
+      b.addEventListener("click", function () { activeCat = c; renderCats(); renderList(); });
+      box.appendChild(b);
+    });
+  }
+  function renderList() {
+    var q = key($("q").value.trim());
+    var rows = ALL.filter(function (e) {
+      return (activeCat === "Tout" || e[0] === activeCat) && (!q || key(e[1]).indexOf(q) > -1 || key(e[2]).indexOf(q) > -1);
+    });
+    $("count").textContent = rows.length + (rows.length > 1 ? " entrées" : " entrée");
+    var list = $("list"); list.textContent = "";
+    if (!rows.length) { var d = document.createElement("div"); d.className = "empty"; d.textContent = "Aucun résultat. Essaie un autre mot ou une autre catégorie."; list.appendChild(d); return; }
+    rows.forEach(function (e) {
+      var custom = e[0] === "Mes mots";
+      var r = document.createElement("div"); r.className = "row" + (custom ? " custom" : "");
+      var a = document.createElement("span"); a.className = "fr"; a.textContent = e[1];
+      var b = document.createElement("span"); b.className = "ko"; b.textContent = e[2];
+      r.appendChild(a); r.appendChild(b);
+      if (custom) {
+        var x = document.createElement("button"); x.type = "button"; x.className = "del"; x.textContent = "Retirer";
+        x.setAttribute("aria-label", "Retirer " + e[1]);
+        x.addEventListener("click", function () {
+          CUSTOM = CUSTOM.filter(function (c) { return !(c[0] === e[1] && c[1] === e[2]); });
+          saveCustom(); refresh();
+        });
+        r.appendChild(x);
+      }
+      list.appendChild(r);
+    });
+  }
+  function refresh() { build(); renderCats(); renderList(); showLocal("Traduction par règles et lexique"); }
+  $("q").addEventListener("input", renderList);
+  $("addform").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    var fr = $("addfr").value.trim(), ko = $("addko").value.trim();
+    if (!fr || !ko) return;
+    CUSTOM.unshift([fr, ko]); saveCustom();
+    $("addfr").value = ""; $("addko").value = ""; activeCat = "Mes mots";
+    refresh();
+  });
+
+  build(); renderCats(); renderList();
+  showLocal("Traduction par règles et lexique");
+
+  // Dans Claude, la traduction peut passer par Claude ; ailleurs, la page reste autonome.
+  if (window.claude && window.claude.use) {
+    window.claude.use("sample").then(function (s) {
+      sample = s || null;
+      if (sample) $("foot").textContent = "Traduction par Claude, avec ce lexique comme référence. Sans connexion, la page traduit par règles.";
+    }, function () { sample = null; });
+  }
+})();
+</script>
+
+</body></html>
